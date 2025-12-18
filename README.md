@@ -1,54 +1,54 @@
-# Ecomus E-commerce Platform
+# Electronics Store E-commerce Platform
 
-A comprehensive full-stack e-commerce solution built using the MERN stack (MongoDB, Express, React, Node.js). This project consists of three main components: a robust backend API, a responsive customer storefront, and a feature-rich admin dashboard.
-
-## 📂 Project Structure
-
-The workspace is organized into three main directories:
-
-*   **`Ecomas-backend-main/`**: The server-side application built with Node.js and Express. It handles API requests, database interactions (MongoDB), authentication, and business logic.
-*   **`ecomus-frontend-new-main/`**: The client-side application for customers. Built with React, it allows users to browse products, manage their cart, place orders, and track shipments.
-*   **`ecomusAdmin-main/`**: The administrative control panel. Built with React, it enables administrators to manage inventory, process orders, update banners, and oversee user activity.
+A professional, full-stack e-commerce application designed specifically for an electronics retailer. Built using the MERN stack (MongoDB, Express, React, Node.js), this platform delivers a secure shopping experience for customers and a robust management system for administrators.
 
 ## 🚀 Features
 
 ### Customer Storefront
-*   **Product Browsing**: View products with details, images, and reviews.
-*   **Search & Filter**: Find products by category, brand, or keywords.
-*   **Shopping Cart**: Add items, update quantities, and manage cart.
-*   **Checkout & Orders**: Secure checkout process and order history tracking.
-*   **User Account**: Profile management, address book, and wishlist.
-*   **Order Tracking**: Real-time status updates for placed orders.
+*   **User Authentication**: Secure login and registration functionality using JWT.
+*   **Product Discovery**: Comprehensive product listings with detailed specifications and images.
+*   **Shopping Cart & Checkout**: Seamless cart management and a streamlined checkout process.
+*   **Online Payments**: Integrated **Razorpay** gateway for secure and reliable transactions.
+*   **Order Tracking**: Visual status timeline for customers to track orders from **Pending** → **Processing** → **Shipped** → **Delivered**.
+*   **Ratings & Reviews**: Exclusive review system allowing only verified purchasers to rate products.
+
+### Backend & Business Logic
+*   **Tax Calculation**: Automated GST calculation logic implemented on the server side.
+*   **Stock Management**: Real-time inventory updates triggered automatically after successful payments.
+*   **Invoicing**: Automated order confirmation emails sent to customers with attached invoices.
 
 ### Admin Dashboard
-*   **Dashboard Overview**: Analytics on sales, orders, and customers.
-*   **Product Management**: Add, edit, and delete products, variants, and categories.
-*   **Order Management**: View and update order statuses (Placed, Shipped, Delivered).
-*   **Content Management**: Manage banners, sliders, and website information.
-*   **User Management**: View and manage registered users.
-
-### Backend API
-*   **RESTful Architecture**: Organized routes for resources (Products, Users, Orders).
-*   **Authentication**: Secure user and admin authentication (likely JWT).
-*   **Database**: MongoDB schemas for structured data storage.
-*   **Image Handling**: Upload and management of product and banner images.
+*   **Order Management**: Tools to view orders, manage workflows, and update delivery statuses.
+*   **Analytics**: Dashboard providing insights into order trends and sales performance.
 
 ## 🛠️ Tech Stack
 
-*   **Frontend**: React.js, Redux (State Management), CSS/Bootstrap.
-*   **Backend**: Node.js, Express.js.
-*   **Database**: MongoDB, Mongoose.
-*   **Tools**: npm, Git.
+*   **Frontend**: React.js, Axios
+*   **Backend**: Node.js, Express.js
+*   **Database**: MongoDB, Mongoose
+*   **Authentication**: JSON Web Tokens (JWT)
+*   **Payment Gateway**: Razorpay
+
+## 📂 Project Structure
+
+The solution is architected into three distinct applications:
+
+*   **`Ecomas-backend-main/`**: The RESTful API server handling business logic, database interactions, authentication, and payment processing.
+*   **`ecomus-frontend-new-main/`**: The customer-facing React application.
+*   **`ecomusAdmin-main/`**: The administrative React dashboard for store operations.
 
 ## ⚙️ Installation & Setup
 
-To run the project locally, follow these steps for each component:
+### Prerequisites
+*   Node.js & npm
+*   MongoDB (Local or Atlas)
+*   Razorpay Account credentials
 
 ### 1. Backend Setup
 ```bash
 cd Ecomas-backend-main
 npm install
-# Ensure you have a .env file configured with your MongoDB URI and other secrets
+# Configure your .env file
 npm start
 ```
 
@@ -58,7 +58,6 @@ cd ecomus-frontend-new-main
 npm install
 npm start
 ```
-The application will typically run on `http://localhost:3000`.
 
 ### 3. Admin Panel Setup
 ```bash
@@ -66,12 +65,43 @@ cd ecomusAdmin-main
 npm install
 npm start
 ```
-The admin panel will typically run on a separate port (e.g., `http://localhost:3001` or similar).
 
-## 🤝 Contributing
+## 🔐 Environment Variables
 
-Feel free to submit issues and enhancement requests.
+Create a `.env` file in the `Ecomas-backend-main` directory with the following keys:
 
-## 📄 License
+```env
+PORT=8000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret_key
+RAZORPAY_KEY_ID=your_razorpay_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+EMAIL_HOST=your_email_host
+EMAIL_USER=your_email_address
+EMAIL_PASS=your_email_password
+```
 
-[Your License Here]
+## 📡 API Overview
+
+The backend exposes RESTful endpoints covering:
+*   **Authentication**: User registration and login.
+*   **Products**: Retrieval of product details and categories.
+*   **Orders**: Order creation, status updates, and history.
+*   **Payments**: Razorpay order generation and verification.
+*   **Reviews**: Submission and retrieval of product ratings.
+
+## 📸 Screenshots
+
+*(Placeholders for project screenshots)*
+
+*   **Home Page**
+*   **Product Details & Reviews**
+*   **Cart & Checkout**
+*   **Order Tracking Timeline**
+*   **Admin Dashboard**
+
+## 🔮 Future Improvements
+
+*   Advanced product filtering and search optimization.
+*   Multi-currency support.
+*   Mobile application integration.
