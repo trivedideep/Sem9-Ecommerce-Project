@@ -5,7 +5,7 @@ const orderSchema = mongoose.Schema(
     orderid: {
       type: String,
       required: true,
-      unique: [true,"already in database"],
+      unique: [true, "already in database"],
     },
     shipping_first_name: {
       type: String,
@@ -41,19 +41,19 @@ const orderSchema = mongoose.Schema(
     },
     shipping_email: {
       type: String,
-      required: [true,"email is Required"],
+      required: [true, "email is Required"],
     },
     shipping_mobile: {
       type: String,
-      required: [true,"mobile is Required"],
+      required: [true, "mobile is Required"],
     },
     coupon_name: {
       type: String,
-      default:null
+      default: null
     },
     coupon_amount: {
       type: Number,
-     default:0
+      default: 0
     },
     payment_key: {
       type: String,
@@ -80,11 +80,23 @@ const orderSchema = mongoose.Schema(
     },
     shipping_charges: {
       type: Number,
-     default:0
+      default: 0
+    },
+    subtotal: {
+      type: Number,
+      default: 0,
+    },
+    gstAmount: {
+      type: Number,
+      default: 0,
+    },
+    totalAmount: {
+      type: Number,
+      default: 0,
     },
     tax_amount: {
       type: Number,
-     default:0
+      default: 0
     },
     sub_total_amount: {
       type: Number
@@ -94,7 +106,7 @@ const orderSchema = mongoose.Schema(
     },
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref:'Usertable'
+      ref: 'Usertable'
     }
   },
   { timestamps: true }

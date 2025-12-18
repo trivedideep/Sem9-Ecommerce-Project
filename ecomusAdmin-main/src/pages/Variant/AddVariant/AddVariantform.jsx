@@ -64,7 +64,7 @@ const AddVariantform = ({ id }) => {
       } else {
         setapiresponse(response.error.error);
       }
-    } catch (error) {}
+    } catch (error) { }
   };
   // create product api end here
 
@@ -102,7 +102,7 @@ const AddVariantform = ({ id }) => {
           setcategoryid([value]);
         }
       }
-    } catch (error) {}
+    } catch (error) { }
   };
   // fetch sub category api end here
 
@@ -228,7 +228,7 @@ const AddVariantform = ({ id }) => {
                       className="form-control"
                       placeholder="Product Name"
                       value={values.product_name}
-                      
+
                     />
                   </div>
                   <div className="offset-lg-4 col-lg-8">
@@ -875,11 +875,11 @@ const AddVariantform = ({ id }) => {
                 </div>
               </div>
 
-              <div style={{width:"19.866667%"}} className="col-2 px-2 pt-3">
+              <div style={{ width: "19.866667%" }} className="col-2 px-2 pt-3">
                 <div className="row">
                   <div className="col-lg-12">
                     <label htmlFor="" className="form-label">
-                    Brand <span style={{ color: "red" }}>*</span>{" "}
+                      Brand <span style={{ color: "red" }}>*</span>{" "}
                     </label>
                   </div>
                   <div className="col-lg-12">
@@ -898,11 +898,11 @@ const AddVariantform = ({ id }) => {
                   </div>
                 </div>
               </div>
-              <div style={{width:"19.866667%"}} className="col-2 px-2 pt-3">
+              <div style={{ width: "19.866667%" }} className="col-2 px-2 pt-3">
                 <div className="row">
                   <div className="col-lg-12">
                     <label htmlFor="" className="form-label">
-                    Color <span style={{ color: "red" }}>*</span>{" "}
+                      Color <span style={{ color: "red" }}>*</span>{" "}
                     </label>
                   </div>
                   <div className="col-lg-12">
@@ -921,11 +921,11 @@ const AddVariantform = ({ id }) => {
                   </div>
                 </div>
               </div>
-              <div style={{width:"19.866667%"}} className="col-2 px-2 pt-3">
+              <div style={{ width: "19.866667%" }} className="col-2 px-2 pt-3">
                 <div className="row">
                   <div className="col-lg-12">
                     <label htmlFor="" className="form-label">
-                    Size <span style={{ color: "red" }}>*</span>{" "}
+                      Size <span style={{ color: "red" }}>*</span>{" "}
                     </label>
                   </div>
                   <div className="col-lg-12">

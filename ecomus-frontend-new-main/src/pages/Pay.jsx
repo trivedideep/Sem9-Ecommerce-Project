@@ -12,6 +12,18 @@ const Pay = () => {
   console.log("this is userinfo with product details", location)
 
   const { data: cartdata, isLoading: cartloading } = useGetCartProductQuery();
+
+  const formatCurrency = (value = 0) => {
+    const parsed = Number(value) || 0;
+    return parsed.toFixed(2);
+  };
+
+  const billingSummary = {
+    subtotal: cartdata?.subtotal ?? cartdata?.total_Amount_with_discount_subtotal ?? 0,
+    gstAmount: cartdata?.gstAmount ?? 0,
+    shipping: cartdata?.shipping_charges ?? 0,
+    totalPayable: cartdata?.totalPayable ?? cartdata?.total_Amount_with_discount ?? 0,
+  };
   const Codpay = async () => {
     const orderInfo = {
       shipping_first_name: userinfo.first_name,
@@ -25,8 +37,8 @@ const Pay = () => {
       shipping_email: userinfo.email,
       shipping_mobile: userinfo.phone_number,
       payment_method: "COD",
-      total_amount: userinfo.total,
-      shipping_charges: cartdata.shipping_charges,
+      total_amount: billingSummary.totalPayable,
+      shipping_charges: billingSummary.shipping,
     };
     nvg("/thankyoupage", {
       state: {
@@ -63,8 +75,8 @@ const Pay = () => {
           payment_key: paymentId,
           payment_status: "received",
           payment_method: "Online",
-          total_amount: userinfo.total,
-          shipping_charges: cartdata.shipping_charges,
+          total_amount: billingSummary.totalPayable,
+          shipping_charges: billingSummary.shipping,
         };
 
         try {
@@ -232,25 +244,29 @@ const Pay = () => {
                       </ul>
                       <ul className="sub-total">
                         <li style={{ fontSize: "12px" }}>
-                          Subtotal{" "}
+                          Subtotal
                           <span style={{ fontSize: "12px" }} className="count">
-                            ₹{cartdata.total_Amount_with_discount_subtotal}
+                            ₹{formatCurrency(billingSummary.subtotal)}
                           </span>
                         </li>
                         <li style={{ fontSize: "12px" }}>
-                          Shipping{" "}
+                          GST (18%)
                           <span style={{ fontSize: "12px" }} className="count">
-                            {/* ₹{0.0} */}
-                            ₹{cartdata.shipping_charges === 0 ? `0.00` : cartdata.shipping_charges}
-
+                            ₹{formatCurrency(billingSummary.gstAmount)}
+                          </span>
+                        </li>
+                        <li style={{ fontSize: "12px" }}>
+                          Shipping
+                          <span style={{ fontSize: "12px" }} className="count">
+                            ₹{formatCurrency(billingSummary.shipping)}
                           </span>
                         </li>
                       </ul>
                       <ul className="sub-total">
                         <li>
-                          Total{" "}
+                          Total Payable
                           <span style={{ fontSize: "12px" }} className="count">
-                            ₹{cartdata.total_Amount_with_discount}
+                            ₹{formatCurrency(billingSummary.totalPayable)}
                           </span>
                         </li>
                       </ul>

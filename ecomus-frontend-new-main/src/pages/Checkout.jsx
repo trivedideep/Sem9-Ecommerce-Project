@@ -15,9 +15,21 @@ const Checkout = () => {
   const { data: cartdata, isLoading: cartloading } = useGetCartProductQuery();
   const { data: addressdata, isLoading: addressloading } = useGetUserAddressQuery()
 
+  const formatCurrency = (value = 0) => {
+    const parsed = Number(value) || 0;
+    return parsed.toFixed(2);
+  };
+
+  const billingSummary = {
+    subtotal: cartdata?.subtotal ?? cartdata?.total_Amount_with_discount_subtotal ?? 0,
+    gstAmount: cartdata?.gstAmount ?? 0,
+    shipping: cartdata?.shipping_charges ?? 0,
+    totalPayable: cartdata?.totalPayable ?? cartdata?.total_Amount_with_discount ?? 0,
+  };
+
   const checkoutform = async (values) => {
     const data = {
-      total: cartdata.total_Amount_with_discount,
+      total: billingSummary.totalPayable,
       payment_types: "COD",
       country: values.country,
       first_name: values.first_name,
@@ -557,7 +569,16 @@ const Checkout = () => {
                                   style={{ fontSize: "12px" }}
                                   className="count"
                                 >
-                                  ₹{cartdata.total_Amount_with_discount_subtotal}
+                                  ₹{formatCurrency(billingSummary.subtotal)}
+                                </span>
+                              </li>
+                              <li style={{ fontSize: "12px" }}>
+                                GST (18%)
+                                <span
+                                  style={{ fontSize: "12px" }}
+                                  className="count"
+                                >
+                                  ₹{formatCurrency(billingSummary.gstAmount)}
                                 </span>
                               </li>
                               <li style={{ fontSize: "12px" }}>
@@ -566,20 +587,18 @@ const Checkout = () => {
                                   style={{ fontSize: "12px" }}
                                   className="count"
                                 >
-                                  {/* ₹{0.0} */}
-                                  ₹{cartdata.shipping_charges == 0 ? `0.00` : cartdata.shipping_charges}
-
+                                  ₹{formatCurrency(billingSummary.shipping)}
                                 </span>
                               </li>
                             </ul>
                             <ul className="total">
                               <li>
-                                Total{" "}
+                                Total Payable
                                 <span
                                   style={{ fontSize: "12px" }}
                                   className="count"
                                 >
-                                  ₹{cartdata.total_Amount_with_discount}
+                                  ₹{formatCurrency(billingSummary.totalPayable)}
                                 </span>
                               </li>
                             </ul>

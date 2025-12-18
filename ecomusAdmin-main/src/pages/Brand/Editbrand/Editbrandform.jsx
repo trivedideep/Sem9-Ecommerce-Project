@@ -3,7 +3,7 @@ import "../../../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 import JoditEditor from "jodit-react";
 import { Field, Form, Formik } from "formik";
-import { useGetAllBrandNameQuery, useGetSingleBrandQuery, usePatchBrandMutation } from "../../../store/api/brandapi";
+import { useGetSingleBrandQuery, usePatchBrandMutation } from "../../../store/api/brandapi";
 import { Brandvalidation } from "../Validation/Brandvalidation";
 const Editbrandform = ({ id }) => {
   const { data, isLoading } = useGetSingleBrandQuery(id);
@@ -11,7 +11,6 @@ const Editbrandform = ({ id }) => {
   const [apiresponse, setapiresponse] = useState({});
   const imageInputRef = useRef(null);
   const nvg = useNavigate();
-  const {data:brandname,isLoading:brandnameloading} = useGetAllBrandNameQuery()
   const config = {
     height: "300px",
   };
@@ -30,7 +29,7 @@ const Editbrandform = ({ id }) => {
       } else {
         setapiresponse(response.error.error);
       }
-    } catch (error) {}
+    } catch (error) { }
   };
   // create category api end here
   return isLoading == true ? (
@@ -71,20 +70,22 @@ const Editbrandform = ({ id }) => {
               <div className="col-md-6 px-2 pt-3">
                 <div className="row">
                   <div className="col-lg-4">
-                    <label htmlFor="" className="form-label">
-                    Brand Name <span style={{ color: "red" }}>*</span>
+                    <label htmlFor="brand_name" className="form-label">
+                      Brand Name <span style={{ color: "red" }}>*</span>
                     </label>
                   </div>
                   <div className="col-lg-8">
-                    <Field as="select" name="banner_type" className="form-select">
-                      {brandnameloading == true ? "" : brandname.data.map((item)=>(
-                      <option value={item}>{item}</option>
-                      ))}
-                    </Field>
+                    <Field
+                      type="text"
+                      name="brand_name"
+                      id="brand_name"
+                      className="form-control"
+                      placeholder="Enter brand name"
+                    />
                   </div>
                   <div className="offset-lg-4 col-lg-8">
-                    {errors.banner_type && touched.banner_type ? (
-                      <p style={{ color: "red" }}>{errors.banner_type}</p>
+                    {errors.brand_name && touched.brand_name ? (
+                      <p style={{ color: "red" }}>{errors.brand_name}</p>
                     ) : null}
                   </div>
                 </div>

@@ -1,29 +1,58 @@
 import Header from "../components/Header/Header";
 import Footer from "../components/Footer";
 import { NavLink, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePostOrderMutation } from "../store/api/orderapi";
 
 const Thankyoupage = () => {
-  const [loading, setloading] = useState(true)
+  const [loading, setloading] = useState(true);
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [orderError, setOrderError] = useState(null);
   const location = useLocation();
 
-  const [postorder] = usePostOrderMutation()
-  useEffect(() => {
+  const [postorder] = usePostOrderMutation();
 
+  const formatCurrency = (value = 0) => {
+    const parsed = Number(value) || 0;
+    return parsed.toFixed(2);
+  };
+
+  const billingSummary = useMemo(() => {
+    if (!orderDetails) {
+      return null;
+    }
+    const subtotal = orderDetails.subtotal ?? orderDetails.sub_total_amount ?? 0;
+    const gstAmount = orderDetails.gstAmount ?? orderDetails.tax_amount ?? 0;
+    const shipping = orderDetails.shipping_charges ?? 0;
+    const totalPayable = orderDetails.grand_total_amount ?? (subtotal + gstAmount + shipping);
+    return {
+      subtotal,
+      gstAmount,
+      shipping,
+      totalPayable,
+    };
+  }, [orderDetails]);
+
+  useEffect(() => {
     const checkoutform = async () => {
       try {
-        const response = postorder(location.state.orderinfo)
-        setloading(false)
-      } catch (error) { }
-
-
+        const response = await postorder(location?.state?.orderinfo).unwrap();
+        setOrderDetails(response?.order || null);
+        setOrderError(null);
+      } catch (error) {
+        setOrderError("We couldn't confirm your order. Please contact support if this continues.");
+      } finally {
+        setloading(false);
+      }
     };
-    if (location.state.orderinfo) {
-      checkoutform()
 
+    if (location?.state?.orderinfo) {
+      checkoutform();
+    } else {
+      setloading(false);
+      setOrderError("No order information found. Please return to the shop.");
     }
-  }, [location.state.orderinfo])
+  }, [location?.state?.orderinfo, postorder]);
   return (
     loading === true ? <></> : <>
       <div>
@@ -47,6 +76,39 @@ const Thankyoupage = () => {
                   <div>
                     <p className="text-center" style={{ color: '#8F9091' }} >Your order has been placed and is being processed. You will Receive an Email from Ecomus.</p>
                   </div>
+                  {billingSummary && (
+                    <div className="row justify-content-center mt-4">
+                      <div className="col-lg-6 col-md-8 col-sm-10">
+                        <div className="card shadow-sm">
+                          <div className="card-body">
+                            <h5 className="mb-3" style={{ fontSize: '16px', fontWeight: 600 }}>Bill Summary</h5>
+                            <div className="d-flex justify-content-between mb-2" style={{ fontSize: '13px' }}>
+                              <span>Subtotal</span>
+                              <span>₹{formatCurrency(billingSummary.subtotal)}</span>
+                            </div>
+                            <div className="d-flex justify-content-between mb-2" style={{ fontSize: '13px' }}>
+                              <span>GST (18%)</span>
+                              <span>₹{formatCurrency(billingSummary.gstAmount)}</span>
+                            </div>
+                            <div className="d-flex justify-content-between mb-2" style={{ fontSize: '13px' }}>
+                              <span>Shipping</span>
+                              <span>₹{formatCurrency(billingSummary.shipping)}</span>
+                            </div>
+                            <hr />
+                            <div className="d-flex justify-content-between" style={{ fontSize: '14px', fontWeight: 600 }}>
+                              <span>Total Payable</span>
+                              <span>₹{formatCurrency(billingSummary.totalPayable)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {orderError && (
+                    <p className="text-center mt-3" style={{ color: '#ff4d4f', fontSize: '13px' }}>{orderError}</p>
+                  )}
+
                   <div className="backTohome" style={{ paddingTop: '20px' }}>
                     <NavLink to="/home" style={{ lineHeight: '20px', color: '#8F9091', fontSize: '14px' }}>Continue Shopping</NavLink>
                   </div>

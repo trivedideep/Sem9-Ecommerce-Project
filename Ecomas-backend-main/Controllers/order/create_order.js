@@ -5,6 +5,12 @@ const sendEmail = require("../../middlewares/emailconfig");
 const website_info = require("../../Models/website_info");
 const usertable = require("../../Models/usertable");
 
+const GST_RATE = 0.18;
+
+const roundCurrency = (amount = 0) => {
+    return Math.round((Number(amount) || 0) * 100) / 100;
+};
+
 const createorder = async (req, res) => {
     try {
         const {
@@ -18,7 +24,6 @@ const createorder = async (req, res) => {
             shipping_pincode,
             shipping_mobile,
             shipping_email,
-            total_amount,
             payment_method,
             payment_status, // This is key for the stock update
             payment_key,
@@ -29,15 +34,30 @@ const createorder = async (req, res) => {
         const countorder = await order.countDocuments();
 
         // Find cart items to confirm if an order is possible
-        const cartItemsForOrder = await cart.find({
-            user_id,
-            orderstatus: "add to cart",
-        });
+        const cartItemsForOrder = await cart
+            .find({
+                user_id,
+                orderstatus: "add to cart",
+            })
+            .populate("product_id", "selling_price product_name")
+            .populate("product_variant_id", "selling_price product_name");
 
         const countcount = cartItemsForOrder.length;
 
         const orderid = `ORDXXXXX00${countorder}`;
         let savedOrder;
+
+        const subtotal = cartItemsForOrder.reduce((acc, cartItem) => {
+            const linePriceSource = cartItem.product_id || cartItem.product_variant_id;
+            const linePrice = linePriceSource?.selling_price || 0;
+            return acc + linePrice * (cartItem.product_qty || 0);
+        }, 0);
+
+        const roundedSubtotal = roundCurrency(subtotal);
+        const gstAmount = roundCurrency(roundedSubtotal * GST_RATE);
+        const totalAmount = roundCurrency(roundedSubtotal + gstAmount);
+        const normalizedShippingCharges = roundCurrency(shipping_charges);
+        const finalGrandTotal = roundCurrency(totalAmount + normalizedShippingCharges);
 
         const ordernow = new order({
             orderid,
@@ -52,12 +72,16 @@ const createorder = async (req, res) => {
             shipping_pincode,
             shipping_mobile,
             shipping_email,
-            grand_total_amount: total_amount,
-            sub_total_amount: total_amount,
+            subtotal: roundedSubtotal,
+            gstAmount,
+            totalAmount,
+            tax_amount: gstAmount,
+            sub_total_amount: roundedSubtotal,
+            grand_total_amount: finalGrandTotal,
             payment_method,
             payment_status,
             payment_key,
-            shipping_charges,
+            shipping_charges: normalizedShippingCharges,
         });
 
         if (countcount > 0) {
@@ -191,6 +215,19 @@ const createorder = async (req, res) => {
                     <td>
                         <table width="100%" border="0" cellspacing="0" cellpadding="0">
                             <tbody>
+                                <tr>
+                                    <td width="20%" valign="top" style="padding: 8px 6px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; display: flex; justify-content: space-between;">
+                                        <strong>GST (18%) :</strong>  ${savedOrder.gstAmount} INR
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tbody>
                                 <tr style="border-top: 1px solid #eee;">
                                     <td width="20%" valign="top" style="padding: 8px 6px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; display: flex; justify-content: space-between;">
                                         <strong>Shipping Charges :</strong>  ${savedOrder.shipping_charges} INR
@@ -206,7 +243,7 @@ const createorder = async (req, res) => {
                             <tbody>
                                 <tr style="border-top: 1px solid #eee;">
                                     <td width="20%" valign="top" style="padding: 8px 6px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; display: flex; justify-content: space-between;">
-                                        <strong>Grand Total :</strong> ${savedOrder.sub_total_amount} INR
+                                        <strong>Grand Total :</strong> ${savedOrder.grand_total_amount} INR
                                     </td>
                                 </tr>
                             </tbody>

@@ -1,5 +1,11 @@
 
 const cart = require("../../Models/cart");
+const GST_RATE = 0.18;
+
+const roundCurrency = (amount = 0) => {
+  return Math.round((Number(amount) || 0) * 100) / 100;
+};
+
 const addtocartlist = async (req, res) => {
   try {
     const user_id = req.user.id;
@@ -23,11 +29,25 @@ const addtocartlist = async (req, res) => {
       totalDiscount += discount * cartItem.product_qty;
     });
 
-    const shipping_charges = calculateFifteenPercent(total_Amount_with_discount);
+    const subtotal = roundCurrency(total_Amount_with_discount);
+    const gstAmount = roundCurrency(subtotal * GST_RATE);
+    const subtotalWithGst = roundCurrency(subtotal + gstAmount);
+    const shipping_charges = calculateFifteenPercent(subtotal);
+    const totalPayable = roundCurrency(subtotalWithGst + shipping_charges);
 
     res.status(200).send({
-      data: userCart, total_Amount_with_discount_subtotal: total_Amount_with_discount, total_Amount_with_discount: (total_Amount_with_discount + shipping_charges), total_Amount_without_discount,
-      totalItems, totalDiscount, shipping_charges
+      data: userCart,
+      subtotal,
+      gstAmount,
+      totalAmount: subtotalWithGst,
+      totalPayable,
+      total_Amount_with_discount_subtotal: subtotal,
+      total_Amount_with_discount: totalPayable,
+      total_Amount_without_discount,
+      totalItems,
+      totalDiscount,
+      shipping_charges,
+      gstRate: GST_RATE,
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
@@ -38,7 +58,7 @@ const addtocartlist = async (req, res) => {
 
 
 function calculateFifteenPercent(totalAmount) {
-  return totalAmount * 0.15;
+  return roundCurrency(totalAmount * 0.15);
 }
 
 module.exports = addtocartlist
