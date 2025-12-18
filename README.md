@@ -1,107 +1,99 @@
-# Electronics Store E-commerce Platform
+# Ecomus Electronics Store
 
-A professional, full-stack e-commerce application designed specifically for an electronics retailer. Built using the MERN stack (MongoDB, Express, React, Node.js), this platform delivers a secure shopping experience for customers and a robust management system for administrators.
+A MERN-stack e-commerce platform for electronics with secure payments, end-to-end order management, and post-purchase tracking. This README documents the implemented features as they exist today—no future or unbuilt items are listed.
 
-## 🚀 Features
+## Overview
+- **Frontends**: Customer storefront and Admin dashboard (React, Axios)
+- **Backend**: Node.js + Express.js (REST APIs)
+- **Database**: MongoDB with Mongoose models
+- **Payments**: Razorpay for online payments
+- **Auth**: JWT-based authentication
+- **Domain**: Electronics retail (products, cart, checkout, orders)
 
-### Customer Storefront
-*   **User Authentication**: Secure login and registration functionality using JWT.
-*   **Product Discovery**: Comprehensive product listings with detailed specifications and images.
-*   **Shopping Cart & Checkout**: Seamless cart management and a streamlined checkout process.
-*   **Online Payments**: Integrated **Razorpay** gateway for secure and reliable transactions.
-*   **Order Tracking**: Visual status timeline for customers to track orders from **Pending** → **Processing** → **Shipped** → **Delivered**.
-*   **Ratings & Reviews**: Exclusive review system allowing only verified purchasers to rate products.
+## Features (Implemented)
+- User authentication (login/register) via JWT
+- Product listing and product detail pages
+- Shopping cart and checkout
+- Order placement with online payment using Razorpay
+- GST calculation on backend
+- Order confirmation email with invoice
+- Stock management after successful payment
+- Admin order management
+- Order analytics dashboard
+- Ratings & reviews (only for users who purchased)
+- Order tracking with status timeline (Pending → Processing → Shipped → Delivered)
 
-### Backend & Business Logic
-*   **Tax Calculation**: Automated GST calculation logic implemented on the server side.
-*   **Stock Management**: Real-time inventory updates triggered automatically after successful payments.
-*   **Invoicing**: Automated order confirmation emails sent to customers with attached invoices.
+## Tech Stack
+- **Frontend**: React.js, Axios
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB (Mongoose)
+- **Payments**: Razorpay
+- **Auth**: JWT
 
-### Admin Dashboard
-*   **Order Management**: Tools to view orders, manage workflows, and update delivery statuses.
-*   **Analytics**: Dashboard providing insights into order trends and sales performance.
-
-## 🛠️ Tech Stack
-
-*   **Frontend**: React.js, Axios
-*   **Backend**: Node.js, Express.js
-*   **Database**: MongoDB, Mongoose
-*   **Authentication**: JSON Web Tokens (JWT)
-*   **Payment Gateway**: Razorpay
-
-## 📂 Project Structure
-
-The solution is architected into three distinct applications:
-
-*   **`Ecomas-backend-main/`**: The RESTful API server handling business logic, database interactions, authentication, and payment processing.
-*   **`ecomus-frontend-new-main/`**: The customer-facing React application.
-*   **`ecomusAdmin-main/`**: The administrative React dashboard for store operations.
-
-## ⚙️ Installation & Setup
-
-### Prerequisites
-*   Node.js & npm
-*   MongoDB (Local or Atlas)
-*   Razorpay Account credentials
-
-### 1. Backend Setup
+## Installation & Setup
+1) Clone the repository and install dependencies for each app:
 ```bash
+# Backend
 cd Ecomas-backend-main
 npm install
-# Configure your .env file
-npm start
-```
 
-### 2. Frontend (Store) Setup
-```bash
-cd ecomus-frontend-new-main
+# Frontend (customer)
+cd ../ecomus-frontend-new-main
 npm install
-npm start
-```
 
-### 3. Admin Panel Setup
-```bash
-cd ecomusAdmin-main
+# Admin dashboard
+cd ../ecomusAdmin-main
 npm install
-npm start
 ```
+2) Configure environment variables (see examples below).
+3) Run backend, then start the frontends on their respective ports.
 
-## 🔐 Environment Variables
-
-Create a `.env` file in the `Ecomas-backend-main` directory with the following keys:
-
-```env
+## Environment Variables (examples)
+Backend (`Ecomas-backend-main/.env`):
+```
 PORT=8000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret_key
+MONGODB_URI=mongodb://localhost:27017/ecomus
+JWT_SECRET=your_jwt_secret
 RAZORPAY_KEY_ID=your_razorpay_key_id
 RAZORPAY_KEY_SECRET=your_razorpay_key_secret
-EMAIL_HOST=your_email_host
-EMAIL_USER=your_email_address
-EMAIL_PASS=your_email_password
+EMAIL_USER=your_smtp_user
+EMAIL_PASS=your_smtp_pass
+BASE_URL=http://localhost:8000
+```
+Frontend (`ecomus-frontend-new-main/.env`):
+```
+REACT_APP_API_BASE_URL=http://localhost:8000/api
+REACT_APP_API_IMAGE_URL=http://localhost:8000
+```
+Admin (`ecomusAdmin-main/.env`):
+```
+REACT_APP_API_BASE_URL=http://localhost:8000/api
 ```
 
-## 📡 API Overview
+## Folder Structure (high level)
+- `Ecomas-backend-main/` – Node/Express API, routes, controllers, models, middlewares
+- `ecomus-frontend-new-main/` – Customer-facing React app
+- `ecomusAdmin-main/` – Admin React dashboard
 
-The backend exposes RESTful endpoints covering:
-*   **Authentication**: User registration and login.
-*   **Products**: Retrieval of product details and categories.
-*   **Orders**: Order creation, status updates, and history.
-*   **Payments**: Razorpay order generation and verification.
-*   **Reviews**: Submission and retrieval of product ratings.
+## API Overview (basic)
+- Auth: login, register
+- Products: list, single product
+- Cart: add/update/remove items
+- Orders: create order, process payment (Razorpay), update status, tracking data
+- Reviews: add reviews for purchased products
+- Admin: manage orders and view analytics
 
-## 📸 Screenshots
+## Screenshots
+(Place your screenshots here)
+- ![Storefront Screenshot](./screenshots/storefront-placeholder.png)
+- ![Product Detail Screenshot](./screenshots/product-placeholder.png)
+- ![Order Tracking Screenshot](./screenshots/tracking-placeholder.png)
+- ![Admin Dashboard Screenshot](./screenshots/admin-placeholder.png)
 
-*(Placeholders for project screenshots)*
+## Future Improvements (optional)
+- Performance tuning and caching
+- Enhanced reporting for admins
+- Additional payment methods
 
-*   **Home Page**
-*   **Product Details & Reviews**
-*   **Cart & Checkout**
-*   **Order Tracking Timeline**
-*   **Admin Dashboard**
-
-## 🔮 Future Improvements
-
-*   Advanced product filtering and search optimization.
-*   Multi-currency support.
-*   Mobile application integration.
+## License
+Add your chosen license here.
