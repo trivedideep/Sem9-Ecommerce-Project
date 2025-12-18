@@ -6,6 +6,7 @@ import MobileSubcategory from "../../components/Header/MobileSubcategory ";
 import ReactPaginate from "react-paginate";
 import Loader from "../../components/Loader";
 import { useGetAttributeByCategoryQuery } from "../../store/api/categoryapi";
+import RatingStars from "../../components/RatingStars";
 const Category = () => {
   const { id, name, url } = useParams();
   const nvg = useNavigate();
@@ -1149,6 +1150,14 @@ const Category = () => {
                                             className="detail-right"
                                             style={{ width: "100%" }}
                                           >
+                                            <div style={{ display: "flex", justifyContent: "center", marginBottom: "6px" }}>
+                                              <RatingStars
+                                                rating={item?.averageRating || 0}
+                                                reviewCount={item?.totalReviews || 0}
+                                                showCount
+                                                size={12}
+                                              />
+                                            </div>
                                             <div
                                               className="price"
                                               style={{ width: "100%" }}

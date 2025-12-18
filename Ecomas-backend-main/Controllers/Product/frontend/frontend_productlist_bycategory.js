@@ -1,7 +1,8 @@
 const product = require("../../../Models/product");
+const Review = require("../../../Models/review");
 
 const frontendproductlistbycategory = async (req, res) => {
-  const { none, page, max_price, min_price, order,orderby,brand,size,color,weight } =
+  const { none, page, max_price, min_price, order, orderby, brand, size, color, weight } =
     req.query;
   try {
     const categoryId = req.params.id;
@@ -20,7 +21,7 @@ const frontendproductlistbycategory = async (req, res) => {
       if (orderby == "selling_price") {
         sortOptions[orderby] = order === "ASE" ? 1 : -1;
       }
-    }else{
+    } else {
       sortOptions['selling_price'] = 1;
     }
 
@@ -36,11 +37,11 @@ const frontendproductlistbycategory = async (req, res) => {
       if (max_price) baseQuery.selling_price.$lte = parseInt(max_price);
     }
 
-if(weight){
-  const [weightnum, weighttype] = weight.split(' ');
-   baseQuery.weight = weightnum;
-    baseQuery.weight_type = weighttype;
-}
+    if (weight) {
+      const [weightnum, weighttype] = weight.split(' ');
+      baseQuery.weight = weightnum;
+      baseQuery.weight_type = weighttype;
+    }
     if (color) baseQuery.color = color;
     if (size) baseQuery.size = size;
     if (brand) baseQuery.brand = brand;
@@ -55,18 +56,55 @@ if(weight){
       .skip(skip)
       .limit(itemsPerPage);
 
-      const totalItems = totalCountBeforeFilter;
-      const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const productIds = productsBeforeFilter.map((item) => item._id);
+    let ratingSummaryMap = new Map();
 
-      res.status(200).json({
-        status: "success",
-        data: productsBeforeFilter,
-        totalPages,
-        itemsPerPage,
-        totalItems,
-        pageNumber,
-      });
-    
+    if (productIds.length) {
+      const ratingSummary = await Review.aggregate([
+        { $match: { productId: { $in: productIds } } },
+        {
+          $group: {
+            _id: "$productId",
+            averageRating: { $avg: "$rating" },
+            totalReviews: { $sum: 1 },
+          },
+        },
+      ]);
+
+      ratingSummaryMap = ratingSummary.reduce((map, summary) => {
+        map.set(summary._id.toString(), {
+          averageRating: Number(summary.averageRating.toFixed(1)),
+          totalReviews: summary.totalReviews,
+        });
+        return map;
+      }, new Map());
+    }
+
+    const productsWithRatings = productsBeforeFilter.map((item) => {
+      const summary = ratingSummaryMap.get(item._id.toString()) || {
+        averageRating: 0,
+        totalReviews: 0,
+      };
+
+      return {
+        ...item.toObject(),
+        averageRating: summary.averageRating,
+        totalReviews: summary.totalReviews,
+      };
+    });
+
+    const totalItems = totalCountBeforeFilter;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    res.status(200).json({
+      status: "success",
+      data: productsWithRatings,
+      totalPages,
+      itemsPerPage,
+      totalItems,
+      pageNumber,
+    });
+
   } catch (error) {
     res.status(500).json({ status: "failed", error: error.message });
   }

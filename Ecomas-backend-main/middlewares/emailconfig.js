@@ -1,19 +1,20 @@
 const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
   secure: false,
   auth: {
-    user: 'deeptrivedi2002@gmail.com',
-    pass: 'wptegvolskfymhaw'
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
   },
 });
 
 async function sendEmail(to, subject, text, html) {
   try {
     const mailOptions = {
-      from: 'diptrivedi02@gmail.com', // sender address
+      from: process.env.EMAIL_FROM, // sender address
       to: to,                            // recipient address
       subject: subject,                  // subject line
       text: text,                        // plain text body
@@ -25,7 +26,7 @@ async function sendEmail(to, subject, text, html) {
   } catch (error) {
     console.error('Error sending email: ', error);
     return { success: false, error: error.message };
-  } 
+  }
 }
 
 module.exports = sendEmail;

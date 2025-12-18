@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState, useCallback } from "react";
 import Header from "../components/Header/Header";
 import OwlCarousel from "react-owl-carousel";
 import ReactImageMagnify from "react-image-magnify";
@@ -8,11 +8,13 @@ import Footer from "../components/Footer";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { FaRegHeart, FaHeart } from "react-icons/fa6";
+import { FaStar, FaRegStar } from "react-icons/fa";
 import { getrecetly, gettoken, recentlystore } from "../Localstorage/Store";
 import { useGetProductByCategoryQuery, useGetSingleProductQuery } from "../store/api/productapi";
 import { usePostCartItemMutation } from "../store/api/cartapi";
 import { useGetWishlistCountQuery, usePostDeleteWishlistMutation, usePostWishlistItemMutation } from "../store/api/wishlistapi";
 import { useGetRecommendationsQuery } from "../store/api/orderapi";
+import RatingStars from "../components/RatingStars";
 import { useDispatch, useSelector } from "react-redux";
 import { addwishlist } from "../store/state/wishlist";
 import { skipToken } from "@reduxjs/toolkit/query";
@@ -62,6 +64,9 @@ const appendCategoryIdsToSet = (source, targetSet) => {
   }
 };
 
+const ensureTrailingSlash = (value = "") => (value.endsWith("/") ? value : `${value}/`);
+const API_BASE_URL = ensureTrailingSlash(process.env.REACT_APP_API_URL || "http://localhost:8000/api/");
+
 const options5 = {
   items: 1,
   loop: false,
@@ -108,6 +113,8 @@ function Productdetails() {
   const recentlydata = getrecetly();
   const dispatch = useDispatch();
   const checktoken = gettoken()
+  const storedToken = typeof window !== "undefined" ? localStorage.getItem("ecomustoken") : null;
+  const normalizedToken = storedToken ? storedToken.replace(/"/g, "") : null;
   const globalvariable = useSelector(state => state);
   const [viewimg, setviewimg] = useState(null);
   const [qty, setqty] = useState(1);
@@ -116,6 +123,15 @@ function Productdetails() {
   const [delto, setdelto] = useState("");
   const [Data23, setData] = useState([]);
   const [delresponse, setdelresponse] = useState({ status: false, msg: "" });
+  const [reviews, setReviews] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalReviews, setTotalReviews] = useState(0);
+  const [canReview, setCanReview] = useState(false);
+  const [ratingInput, setRatingInput] = useState(0);
+  const [commentInput, setCommentInput] = useState("");
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewError, setReviewError] = useState("");
+  const [reviewStatus, setReviewStatus] = useState("");
   const { data, isLoading, refetch } = useGetSingleProductQuery(id);
   const productCategoryIds = useMemo(() => {
     const collected = new Set();
@@ -271,6 +287,75 @@ function Productdetails() {
 
   const profilepage = (val) => {
     nvg("/profile", { state: { id: val } });
+  };
+
+  const refreshReviews = useCallback(async () => {
+    if (!currentProductId) return;
+    setReviewsLoading(true);
+    setReviewError("");
+    try {
+      const response = await axios.get(`${API_BASE_URL}review/product/${currentProductId}`, {
+        headers: normalizedToken ? { Authorization: `Bearer ${normalizedToken}` } : {},
+      });
+
+      const payload = response.data?.data || {};
+      setReviews(payload.reviews || []);
+      setAverageRating(payload.averageRating || 0);
+      setTotalReviews(payload.totalReviews || 0);
+      setCanReview(payload.canReview || false);
+
+      if (payload.userReview) {
+        setRatingInput(payload.userReview.rating);
+        setCommentInput(payload.userReview.comment || "");
+      } else {
+        setRatingInput(0);
+        setCommentInput("");
+      }
+    } catch (error) {
+      setReviewError("Unable to load reviews right now.");
+    } finally {
+      setReviewsLoading(false);
+    }
+  }, [currentProductId, normalizedToken]);
+
+  useEffect(() => {
+    refreshReviews();
+  }, [refreshReviews]);
+
+  const handleReviewSubmit = async (event) => {
+    event.preventDefault();
+    setReviewError("");
+    setReviewStatus("");
+
+    if (!normalizedToken) {
+      nvg("/login");
+      return;
+    }
+
+    if (!ratingInput) {
+      setReviewError("Please select a rating to continue.");
+      return;
+    }
+
+    try {
+      await axios.post(
+        `${API_BASE_URL}review/add`,
+        {
+          productId: currentProductId,
+          rating: ratingInput,
+          comment: commentInput,
+        },
+        {
+          headers: { Authorization: `Bearer ${normalizedToken}` },
+        }
+      );
+
+      setReviewStatus("Thanks! Your review has been saved.");
+      await refreshReviews();
+    } catch (error) {
+      const serverMessage = error?.response?.data?.error || "Unable to save review.";
+      setReviewError(serverMessage);
+    }
   };
 
   // Track increments/decrements
@@ -595,10 +680,7 @@ function Productdetails() {
       </div>
       {/* breadcrumb End */}
       {/* section start */}
-      <section
-        className="section-big-pt-space b-g-light"
-        style={{ background: "white" }}
-      >
+      <section>
         <div className="collection-wrapper">
           <div className="custom-container">
             <div className="row">
@@ -743,6 +825,14 @@ function Productdetails() {
                       >
                         <div className="pro-group">
                           <h2>{Data23?.[showoption]?.product_name}</h2>
+                          <div style={{ marginTop: "6px" }}>
+                            <RatingStars
+                              rating={averageRating}
+                              reviewCount={totalReviews}
+                              showCount
+                              size={16}
+                            />
+                          </div>
                           <div className="revieu-box">
                             <ul className="pro-price">
                               <li
@@ -1073,6 +1163,133 @@ function Productdetails() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section
+        className="section-big-pt-space b-g-light"
+        style={{ background: "white", borderTop: "1px solid #f1f2f3" }}
+      >
+        <div className="custom-container">
+          <div className="row">
+            <div className="col-lg-7">
+              <h3
+                className="mb-3"
+                style={{ fontSize: "20px", fontWeight: 700 }}
+              >
+                Ratings & Reviews
+              </h3>
+              <div className="d-flex align-items-center gap-3 mb-3">
+                <RatingStars
+                  rating={averageRating}
+                  reviewCount={totalReviews}
+                  showCount
+                  size={16}
+                />
+                <span style={{ fontSize: "13px", color: "#8F9091" }}>
+                  Based on {totalReviews || 0} {totalReviews === 1 ? "review" : "reviews"}
+                </span>
+              </div>
+              {reviewsLoading ? (
+                <p style={{ fontSize: "13px", color: "#8F9091" }}>Loading reviews...</p>
+              ) : reviews.length ? (
+                <div className="review-scroll">
+                  {reviews.map(review => (
+                    <div
+                      key={review?._id}
+                      className="border rounded p-3 mb-3"
+                      style={{ background: "#fafafa" }}
+                    >
+                      <div className="d-flex justify-content-between align-items-center mb-1">
+                        <span style={{ fontWeight: 600, fontSize: "13px" }}>
+                          {review?.userId?.first_name || "Customer"} {review?.userId?.last_name || ""}
+                        </span>
+                        <RatingStars rating={review?.rating} size={12} />
+                      </div>
+                      {review?.comment && (
+                        <p style={{ fontSize: "12px", marginBottom: "4px" }}>{review.comment}</p>
+                      )}
+                      <small style={{ fontSize: "11px", color: "#8F9091" }}>
+                        {review?.createdAt ? new Date(review.createdAt).toLocaleDateString() : ""}
+                      </small>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ fontSize: "13px", color: "#8F9091" }}>
+                  Be the first to review this product.
+                </p>
+              )}
+            </div>
+            <div className="col-lg-5 mt-4 mt-lg-0">
+              <div className="border rounded p-4 h-100" style={{ background: "#fdfdfd" }}>
+                <h5 style={{ fontSize: "16px", fontWeight: 600 }}>Share your feedback</h5>
+                {!checktoken ? (
+                  <p style={{ fontSize: "13px" }}>
+                    <button
+                      type="button"
+                      className="btn btn-link p-0"
+                      style={{ fontSize: "13px" }}
+                      onClick={() => nvg("/login")}
+                    >
+                      Sign in
+                    </button>{" "}
+                    to write a review.
+                  </p>
+                ) : canReview ? (
+                  <form onSubmit={handleReviewSubmit}>
+                    <div className="mb-2">
+                      <label className="form-label" style={{ fontSize: "12px", fontWeight: 600 }}>
+                        Rating
+                      </label>
+                      <div className="d-flex" style={{ gap: "6px" }}>
+                        {[1, 2, 3, 4, 5].map(value => (
+                          <button
+                            type="button"
+                            key={`rating-${value}`}
+                            className="btn p-0"
+                            onClick={() => setRatingInput(value)}
+                            aria-label={`Rate ${value} star`}
+                          >
+                            {value <= ratingInput ? (
+                              <FaStar size={18} color="#f5a623" />
+                            ) : (
+                              <FaRegStar size={18} color="#c5c5c5" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="mb-2">
+                      <label className="form-label" style={{ fontSize: "12px", fontWeight: 600 }}>
+                        Comment (optional)
+                      </label>
+                      <textarea
+                        className="form-control"
+                        rows={3}
+                        style={{ fontSize: "12px" }}
+                        placeholder="Tell us what you liked"
+                        value={commentInput}
+                        onChange={event => setCommentInput(event.target.value)}
+                      />
+                    </div>
+                    {reviewError && (
+                      <p style={{ color: "#d9534f", fontSize: "12px" }}>{reviewError}</p>
+                    )}
+                    {reviewStatus && (
+                      <p style={{ color: "#28a745", fontSize: "12px" }}>{reviewStatus}</p>
+                    )}
+                    <button type="submit" className="btn btn-primary mt-3" style={{ fontSize: "12px" }}>
+                      Submit Review
+                    </button>
+                  </form>
+                ) : (
+                  <p style={{ fontSize: "13px", color: "#8F9091" }}>
+                    You can review this product after completing a purchase.
+                  </p>
+                )}
               </div>
             </div>
           </div>

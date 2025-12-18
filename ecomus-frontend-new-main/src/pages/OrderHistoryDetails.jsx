@@ -40,8 +40,19 @@ const resolveProductData = (item) => {
     const unitPrice = Number(
         source.selling_price ?? item?.selling_price ?? item?.price ?? 0
     );
+    const productId =
+        item?.product_id?._id ||
+        item?.product_id ||
+        variant?.product_id?._id ||
+        variant?.product_id ||
+        product?._id ||
+        source?.product_id?._id ||
+        source?.product_id ||
+        source?._id ||
+        item?.product?._id ||
+        item?.productId;
 
-    return { name, image, unitPrice };
+    return { name, image, unitPrice, productId };
 };
 
 const OrderHistoryDetails = () => {
@@ -57,6 +68,7 @@ const OrderHistoryDetails = () => {
 
     const order = data?.data;
     const items = data?.existingCartItem || [];
+    const trackingId = order?._id || orderId;
 
     const totalItems = useMemo(
         () => items.reduce((sum, item) => sum + (item?.product_qty || 0), 0),
@@ -132,6 +144,7 @@ const OrderHistoryDetails = () => {
                                                     width: "100%",
                                                     display: "flex",
                                                     justifyContent: "space-between",
+                                                    alignItems: "center",
                                                     padding: "0px 9px",
                                                     fontWeight: 700,
                                                     fontSize: "13px",
@@ -146,6 +159,17 @@ const OrderHistoryDetails = () => {
                                                     {statusDate !== "--" ? ` on ${statusDate}` : ""}
                                                 </span>
                                             </h4>
+                                            {trackingId ? (
+                                                <div className="track-order-wrapper">
+                                                    <button
+                                                        type="button"
+                                                        className="track-order-btn"
+                                                        onClick={() => navigate(`/order-tracking/${trackingId}`)}
+                                                    >
+                                                        Track Order
+                                                    </button>
+                                                </div>
+                                            ) : null}
                                         </div>
 
                                         <table className="table">
@@ -166,7 +190,9 @@ const OrderHistoryDetails = () => {
                                                     <th className="family px-3" style={{ fontWeight: 600, fontSize: "14px" }}>
                                                         Total
                                                     </th>
-                                                    <th className="family px-3" style={{ fontWeight: 600, fontSize: "14px" }} />
+                                                    <th className="family px-3" style={{ fontWeight: 600, fontSize: "14px" }}>
+                                                        Review
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -178,7 +204,7 @@ const OrderHistoryDetails = () => {
                                                     </tr>
                                                 ) : (
                                                     items.map((item) => {
-                                                        const { name, image, unitPrice } = resolveProductData(item);
+                                                        const { name, image, unitPrice, productId } = resolveProductData(item);
                                                         const quantity = item?.product_qty || 0;
                                                         const lineTotal = unitPrice * quantity;
                                                         const imageUrl = image
@@ -238,7 +264,16 @@ const OrderHistoryDetails = () => {
                                                                         {formatCurrency(lineTotal)}
                                                                     </h6>
                                                                 </td>
-                                                                <td />
+                                                                <td className="px-3" style={{ textAlign: "center" }}>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="review-btn"
+                                                                        onClick={() => productId && navigate(`/productdetails/${productId}`)}
+                                                                        disabled={!productId}
+                                                                    >
+                                                                        Review
+                                                                    </button>
+                                                                </td>
                                                             </tr>
                                                         );
                                                     })

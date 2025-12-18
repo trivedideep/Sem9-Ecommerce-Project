@@ -55,6 +55,9 @@ const Editorder = () => {
   }, [orderdetail]);
 
   const isDelivered = orderdetail?.data?.order_status === 'Delivered';
+  const taxAmount = Number(orderdetail?.data?.tax_amount || 0);
+  const rawTaxPercent = orderdetail?.data?.tax_percentage ?? orderdetail?.data?.tax_rate;
+  const taxDisplayPercent = taxAmount > 0 ? Number(rawTaxPercent) || 18 : null;
 
   return (
     orderloading === true || websiteinfoloading === true ? <></> : <div style={{ padding: '10px 5px' }}>
@@ -157,6 +160,26 @@ const Editorder = () => {
                                 <strong>Sub Total :</strong> {orderdetail.data.sub_total_amount - orderdetail.data.shipping_charges} INR
                               </td>
                             </tr>
+                            {taxAmount > 0 && (
+                              <tr style={{ borderTop: '1px solid black' }}>
+                                <td
+                                  width="20%"
+                                  valign="top"
+                                  style={{
+                                    padding: '8px 6px',
+                                    fontFamily: 'Arial, Helvetica, sans-serif',
+                                    fontSize: '12px',
+                                    display: 'flex',
+                                    justifyContent: 'space-between'
+                                  }}
+                                >
+                                  <strong>
+                                    GST{taxDisplayPercent ? ` (${taxDisplayPercent}%)` : ''} :
+                                  </strong>{' '}
+                                  {taxAmount.toFixed(2)} INR
+                                </td>
+                              </tr>
+                            )}
 
                             {/* ... (Other table rows) */}
                           </tbody>

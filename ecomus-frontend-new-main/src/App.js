@@ -28,6 +28,7 @@ import Termsconditions from "./pages/Termsconditions";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Pay from "./pages/Pay";
 import Categoryforbrand from "./pages/Category-for-brand";
+import OrderTracking from "./pages/OrderTracking";
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
         <Route path="/addresslist" element={<Addresslist />} />
         <Route path="/order-history-detail/:orderId" element={<OrderHistoryDetails />} />
         <Route path="/order-history" element={<OrderHistorytwo />} />
+        <Route path="/order-tracking/:orderId" element={<OrderTracking />} />
         <Route path="/credit" element={<Credit />} />
         <Route path="/pay" element={<Pay />} />
         <Route path="/categoryforbrand/:name" element={<Categoryforbrand />} />

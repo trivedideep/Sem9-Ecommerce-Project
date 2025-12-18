@@ -13,6 +13,7 @@ const carousellistrouter = require("./routes/carousellistRouter.js")
 const brandrouter = require("./routes/brandRouter.js")
 const addressrouter = require("./routes/addressRouter.js")
 const orderrouter = require("./routes/orderRouter.js")
+const reviewrouter = require("./routes/reviewRouter.js")
 const express = require("express");
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -31,6 +32,7 @@ require("./Models/wishlist");
 require("./Models/brand");
 require("./Models/address");
 require("./Models/order");
+require("./Models/review");
 const port = process.env.PORT || 8000;
 const database = process.env.database || "mongodb+srv://azy6049:as1816444@cluster0.hxfuyyu.mongodb.net/?retryWrites=true&w=majority";
 mongoose.set('strictQuery', false);
@@ -44,17 +46,18 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use("/api", inforouter);
 app.use("/api/user", userrouter);
-app.use("/api/product",productrouter);
+app.use("/api/product", productrouter);
 app.use("/api/category", categoryrouter);
 app.use("/api/attribute", attributerouter);
 app.use("/api/banner", bannerrouter);
 app.use("/api/cart", cartrouter);
 app.use("/api/wishlist", wishlistrouter);
 app.use("/api/variant", variantrouter);
-app.use("/api/list",carousellistrouter);
-app.use("/api/brand",brandrouter);
-app.use("/api/address",addressrouter);
-app.use("/api/order",orderrouter);
+app.use("/api/list", carousellistrouter);
+app.use("/api/brand", brandrouter);
+app.use("/api/address", addressrouter);
+app.use("/api/order", orderrouter);
+app.use("/api/review", reviewrouter);
 
 app.listen(port, () => {
   console.log(`server is runing at ${port}`);

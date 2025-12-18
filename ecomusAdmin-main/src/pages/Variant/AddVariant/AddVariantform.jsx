@@ -149,7 +149,7 @@ const AddVariantform = ({ id }) => {
           trendingproduct: '',
           newarrivedproduct: '',
           featuredproduct: '',
-          brand: "",
+          brand: data?.data?.brand || "",
           color: "",
           size: "",
           product_image1: null,
@@ -889,6 +889,7 @@ const AddVariantform = ({ id }) => {
                       className="form-control"
                       placeholder="Brand"
                       value={values.brand}
+                      readOnly
                     />
                   </div>
                   <div className="col-12">
