@@ -157,7 +157,7 @@ const Editorder = () => {
                             {/* ... (Other table rows) */}
                             <tr>
                               <td width="20%" valign="top" style={{ padding: '8px 6px', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '12px', display: 'flex', justifyContent: 'space-between' }}>
-                                <strong>Sub Total :</strong> {orderdetail.data.sub_total_amount - orderdetail.data.shipping_charges} INR
+                                <strong>Sub Total :</strong> {orderdetail.data.sub_total_amount} INR
                               </td>
                             </tr>
                             {taxAmount > 0 && (
@@ -209,7 +209,13 @@ const Editorder = () => {
                             {/* ... (Other table rows) */}
                             <tr style={{ borderTop: '1px solid black' }}>
                               <td width="20%" valign="top" style={{ padding: '8px 6px', fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '12px', display: 'flex', justifyContent: 'space-between' }}>
-                                <strong>Grand Total :</strong> {orderdetail.data.sub_total_amount} INR
+                                <strong>Grand Total :</strong> {
+                                  (
+                                    Number(orderdetail.data.sub_total_amount || 0) +
+                                    Number(orderdetail.data.shipping_charges || 0) +
+                                    (taxAmount > 0 ? taxAmount : 0)
+                                  ).toFixed(2)
+                                } INR
                               </td>
                             </tr>
 

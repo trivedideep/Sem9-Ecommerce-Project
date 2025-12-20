@@ -22,7 +22,7 @@ const Cart = () => {
   const [vouchererror, setvouchererror] = useState("");
 
   const { data: cartdata, isLoading, refetch } = useGetCartProductQuery();
- 
+
   console.log("rds cartdata:", cartdata);
 
   // add safe local variables to avoid repeating optional chaining
@@ -31,7 +31,14 @@ const Cart = () => {
   const totalAmountWithoutDiscount = cartdata?.total_Amount_without_discount || 0;
   const totalDiscount = cartdata?.totalDiscount || 0;
   const shippingCharges = cartdata?.shipping_charges || 0;
-  const totalAmountWithDiscount = cartdata?.total_Amount_with_discount || 0;
+  const subtotalAmount = cartdata?.subtotal || cartdata?.total_Amount_with_discount_subtotal || 0; // selling price subtotal before tax/shipping
+  const totalAmountWithDiscount = cartdata?.totalPayable || cartdata?.total_Amount_with_discount || 0;
+  const taxAmount = cartdata?.gstAmount ?? cartdata?.tax_amount ?? 0;
+  const taxPercentage =
+    cartdata?.gstPercentage ??
+    (cartdata?.gstRate !== undefined && cartdata?.gstRate !== null ? cartdata.gstRate * 100 : null) ??
+    cartdata?.applied_tax_percentage ??
+    null;
 
   const [updatecart] = usePostUpdateCartMutation();
   const [deletecartitem] = useDeleteCartMutation();
@@ -741,6 +748,27 @@ const Cart = () => {
                     className="family"
                     style={{ fontWeight: 600, fontSize: "12px" }}
                   >
+                    Selling Price Subtotal
+                  </span>
+                  <span
+                    className="family"
+                    style={{
+                      fontWeight: 500,
+                      color: "#059fe2",
+                      fontSize: "12px",
+                    }}
+                  >
+                    ₹{subtotalAmount === 0 ? `0.00` : subtotalAmount}
+                  </span>
+                </div>
+                <div
+                  className="firstrow px-3 d-flex justify-content-between"
+                  style={{ padding: "5px 0px" }}
+                >
+                  <span
+                    className="family"
+                    style={{ fontWeight: 600, fontSize: "12px" }}
+                  >
                     Shipping
                   </span>
                   <span
@@ -754,6 +782,29 @@ const Cart = () => {
                     ₹{shippingCharges === 0 ? `0.00` : parseInt(shippingCharges)}
                   </span>
                 </div>
+                {(taxAmount !== null && taxAmount !== undefined) && (
+                  <div
+                    className="firstrow px-3 d-flex justify-content-between"
+                    style={{ padding: "5px 0px" }}
+                  >
+                    <span
+                      className="family"
+                      style={{ fontWeight: 600, fontSize: "12px" }}
+                    >
+                      Tax{taxPercentage !== null ? ` (${taxPercentage}%)` : ""}
+                    </span>
+                    <span
+                      className="family"
+                      style={{
+                        fontWeight: 500,
+                        color: "#059fe2",
+                        fontSize: "12px",
+                      }}
+                    >
+                      ₹{taxAmount}
+                    </span>
+                  </div>
+                )}
                 {/* <div
                   className="firstrow px-3 d-flex justify-content-between"
                   style={{ padding: "5px 0px" }}

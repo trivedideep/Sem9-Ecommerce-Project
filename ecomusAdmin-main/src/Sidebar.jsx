@@ -187,6 +187,20 @@ const Sidebarmenu = ({ children }) => {
 
               <MenuItem
                 className="nothover"
+                component={<NavLink to="/taxes" />}
+                icon={
+                  <Tippy content="Tax" placement="right">
+                    <img style={{ width: "36px" }} src={img13} alt="Tax" />
+                  </Tippy>
+                }
+                active={location.pathname === "/taxes"}
+              >
+                {" "}
+                Tax
+              </MenuItem>
+
+              <MenuItem
+                className="nothover"
                 component={<NavLink to="/productlist/0" />}
                 icon={
                   <Tippy content="Product" placement="right">

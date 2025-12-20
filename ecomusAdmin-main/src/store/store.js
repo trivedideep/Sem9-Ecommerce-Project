@@ -10,6 +10,7 @@ import { attributeApi } from './api/attributeapi'
 import { variantApi } from './api/variantapi'
 import { brandApi } from './api/brandapi'
 import { orderApi } from './api/orderapi'
+import { taxApi } from './api/taxapi'
 
 export const store = configureStore({
   reducer: {
@@ -23,11 +24,23 @@ export const store = configureStore({
     [variantApi.reducerPath]: variantApi.reducer,
     [brandApi.reducerPath]: brandApi.reducer,
     [orderApi.reducerPath]: orderApi.reducer,
+    [taxApi.reducerPath]: taxApi.reducer,
 
   },
 
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(categoryApi.middleware).concat(userApi.middleware).concat(productApi.middleware).concat(bannerApi.middleware).concat(webinfoApi.middleware).concat(cartApi.middleware).concat(attributeApi.middleware).concat(variantApi.middleware).concat(brandApi.middleware).concat(orderApi.middleware),
+    getDefaultMiddleware()
+      .concat(categoryApi.middleware)
+      .concat(userApi.middleware)
+      .concat(productApi.middleware)
+      .concat(bannerApi.middleware)
+      .concat(webinfoApi.middleware)
+      .concat(cartApi.middleware)
+      .concat(attributeApi.middleware)
+      .concat(variantApi.middleware)
+      .concat(brandApi.middleware)
+      .concat(orderApi.middleware)
+      .concat(taxApi.middleware),
 })
 
 setupListeners(store.dispatch)

@@ -14,6 +14,7 @@ const brandrouter = require("./routes/brandRouter.js")
 const addressrouter = require("./routes/addressRouter.js")
 const orderrouter = require("./routes/orderRouter.js")
 const reviewrouter = require("./routes/reviewRouter.js")
+const taxrouter = require("./routes/taxRouter.js")
 const express = require("express");
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -33,6 +34,7 @@ require("./Models/brand");
 require("./Models/address");
 require("./Models/order");
 require("./Models/review");
+require("./Models/tax");
 const port = process.env.PORT || 8000;
 const database = process.env.database || "mongodb+srv://azy6049:as1816444@cluster0.hxfuyyu.mongodb.net/?retryWrites=true&w=majority";
 mongoose.set('strictQuery', false);
@@ -58,6 +60,7 @@ app.use("/api/brand", brandrouter);
 app.use("/api/address", addressrouter);
 app.use("/api/order", orderrouter);
 app.use("/api/review", reviewrouter);
+app.use("/api/tax", taxrouter);
 
 app.listen(port, () => {
   console.log(`server is runing at ${port}`);

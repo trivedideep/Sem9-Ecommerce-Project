@@ -18,9 +18,21 @@ const Pay = () => {
     return parsed.toFixed(2);
   };
 
+  const getItemPrices = (item) => {
+    const product = item?.product_id === null ? item?.product_variant_id : item?.product_id;
+    return {
+      mrp: Number(product?.mrp_price) || 0,
+      selling: Number(product?.selling_price) || 0,
+      name: product?.product_name || "",
+    };
+  };
+
   const billingSummary = {
+    mrpSubtotal: cartdata?.total_Amount_without_discount ?? 0,
+    discount: cartdata?.totalDiscount ?? 0,
     subtotal: cartdata?.subtotal ?? cartdata?.total_Amount_with_discount_subtotal ?? 0,
     gstAmount: cartdata?.gstAmount ?? 0,
+    gstPercentage: cartdata?.gstPercentage ?? ((cartdata?.gstRate ?? null) !== null ? (cartdata.gstRate * 100) : null),
     shipping: cartdata?.shipping_charges ?? 0,
     totalPayable: cartdata?.totalPayable ?? cartdata?.total_Amount_with_discount ?? 0,
   };
@@ -39,6 +51,12 @@ const Pay = () => {
       payment_method: "COD",
       total_amount: billingSummary.totalPayable,
       shipping_charges: billingSummary.shipping,
+      sub_total_amount: billingSummary.subtotal,
+      mrpSubtotal: billingSummary.mrpSubtotal,
+      total_discount: billingSummary.discount,
+      gstAmount: billingSummary.gstAmount,
+      gstPercentage: billingSummary.gstPercentage,
+      totalPayable: billingSummary.totalPayable,
     };
     nvg("/thankyoupage", {
       state: {
@@ -77,6 +95,12 @@ const Pay = () => {
           payment_method: "Online",
           total_amount: billingSummary.totalPayable,
           shipping_charges: billingSummary.shipping,
+          sub_total_amount: billingSummary.subtotal,
+          mrpSubtotal: billingSummary.mrpSubtotal,
+          total_discount: billingSummary.discount,
+          gstAmount: billingSummary.gstAmount,
+          gstPercentage: billingSummary.gstPercentage,
+          totalPayable: billingSummary.totalPayable,
         };
 
         try {
@@ -218,43 +242,71 @@ const Pay = () => {
                       <ul className="qty">
                         {cartdata.data[0]?.product_name
                           ? cartdata.data.map((item, index) =>
-                            item.product_id === null ? (
-                              <li key={`pay-item-${item._id || index}`} style={{ fontSize: "12px" }}>
-                                {item.product_variant_id.product_name} ×{" "}
-                                {item.product_qty}{" "}
-                                <span style={{ fontSize: "12px" }}>
-                                  ₹
-                                  {item.product_variant_id.selling_price *
-                                    item.product_qty}
-                                </span>
-                              </li>
-                            ) : (
-                              <li key={`pay-item-${item._id || index}`} style={{ fontSize: "12px" }}>
-                                {item.product_id.product_name} ×{" "}
-                                {item.product_qty}{" "}
-                                <span style={{ fontSize: "12px" }}>
-                                  ₹
-                                  {item.product_id.selling_price *
-                                    item.product_qty}
-                                </span>
-                              </li>
-                            )
+                            (() => {
+                              const { mrp, selling, name } = getItemPrices(item);
+                              const qty = item.product_qty;
+                              const lineMrp = mrp * qty;
+                              const lineSelling = selling * qty;
+                              const lineDiscount = lineMrp - lineSelling;
+
+                              return (
+                                <li
+                                  key={`pay-item-${item._id || index}`}
+                                  style={{
+                                    fontSize: "12px",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "2px",
+                                    paddingBottom: "6px",
+                                  }}
+                                >
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                    <span style={{ maxWidth: "70%" }}>{name} × {qty}</span>
+                                    <span style={{ fontSize: "12px" }}>
+                                      ₹{formatCurrency(lineSelling)}
+                                    </span>
+                                  </div>
+                                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", color: "#6c757d" }}>
+                                    <span>MRP: ₹{formatCurrency(lineMrp)}</span>
+                                    {lineDiscount > 0 ? (
+                                      <span style={{ color: "#28a745" }}>
+                                        You save: -₹{formatCurrency(lineDiscount)}
+                                      </span>
+                                    ) : <span />}
+                                  </div>
+                                </li>
+                              );
+                            })()
                           )
                           : ""}
                       </ul>
                       <ul className="sub-total">
                         <li style={{ fontSize: "12px" }}>
-                          Subtotal
+                          Items (MRP)
+                          <span style={{ fontSize: "12px" }} className="count">
+                            ₹{formatCurrency(billingSummary.mrpSubtotal)}
+                          </span>
+                        </li>
+                        <li style={{ fontSize: "12px" }}>
+                          Discount
+                          <span style={{ fontSize: "12px" }} className="count">
+                            -₹{formatCurrency(billingSummary.discount)}
+                          </span>
+                        </li>
+                        <li style={{ fontSize: "12px" }}>
+                          Selling Subtotal
                           <span style={{ fontSize: "12px" }} className="count">
                             ₹{formatCurrency(billingSummary.subtotal)}
                           </span>
                         </li>
-                        <li style={{ fontSize: "12px" }}>
-                          GST (18%)
-                          <span style={{ fontSize: "12px" }} className="count">
-                            ₹{formatCurrency(billingSummary.gstAmount)}
-                          </span>
-                        </li>
+                        {billingSummary.gstAmount > 0 || billingSummary.gstPercentage !== null ? (
+                          <li style={{ fontSize: "12px" }}>
+                            {`GST (${billingSummary.gstPercentage ?? 0}%)`}
+                            <span style={{ fontSize: "12px" }} className="count">
+                              ₹{formatCurrency(billingSummary.gstAmount)}
+                            </span>
+                          </li>
+                        ) : null}
                         <li style={{ fontSize: "12px" }}>
                           Shipping
                           <span style={{ fontSize: "12px" }} className="count">

@@ -90,6 +90,18 @@ const orderSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
+    applied_tax_name: {
+      type: String,
+      default: null,
+    },
+    applied_tax_percentage: {
+      type: Number,
+      default: 0,
+    },
+    tax_effective_from: {
+      type: Date,
+      default: null,
+    },
     totalAmount: {
       type: Number,
       default: 0,

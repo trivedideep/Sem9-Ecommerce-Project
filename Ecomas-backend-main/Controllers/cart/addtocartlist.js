@@ -1,9 +1,27 @@
 
 const cart = require("../../Models/cart");
-const GST_RATE = 0.18;
+const Tax = require("../../Models/tax");
 
 const roundCurrency = (amount = 0) => {
   return Math.round((Number(amount) || 0) * 100) / 100;
+};
+
+// Use the same selection rule as order creation: latest active tax effective on/before today. If none, return 0%.
+const getApplicableTax = async (today = new Date()) => {
+  const applicableTax = await Tax.findOne({
+    isActive: true,
+    effective_from: { $lte: today }
+  }).sort({ effective_from: -1, createdAt: -1 });
+
+  if (!applicableTax) {
+    return { name: "GST", percentage: 0, effective_from: null };
+  }
+
+  return {
+    name: applicableTax.name || "GST",
+    percentage: applicableTax.percentage || 0,
+    effective_from: applicableTax.effective_from || null,
+  };
 };
 
 const addtocartlist = async (req, res) => {
@@ -30,7 +48,10 @@ const addtocartlist = async (req, res) => {
     });
 
     const subtotal = roundCurrency(total_Amount_with_discount);
-    const gstAmount = roundCurrency(subtotal * GST_RATE);
+
+    const { name: taxName, percentage: taxPercentage } = await getApplicableTax(new Date());
+    const taxRate = (Number(taxPercentage) || 0) / 100;
+    const gstAmount = roundCurrency(subtotal * taxRate);
     const subtotalWithGst = roundCurrency(subtotal + gstAmount);
     const shipping_charges = calculateFifteenPercent(subtotal);
     const totalPayable = roundCurrency(subtotalWithGst + shipping_charges);
@@ -39,6 +60,9 @@ const addtocartlist = async (req, res) => {
       data: userCart,
       subtotal,
       gstAmount,
+      gstRate: taxRate,
+      gstPercentage: taxPercentage,
+      gstName: taxName,
       totalAmount: subtotalWithGst,
       totalPayable,
       total_Amount_with_discount_subtotal: subtotal,
@@ -47,7 +71,6 @@ const addtocartlist = async (req, res) => {
       totalItems,
       totalDiscount,
       shipping_charges,
-      gstRate: GST_RATE,
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });

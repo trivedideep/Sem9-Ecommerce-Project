@@ -32,50 +32,52 @@ import Orderlist from "./pages/Order/Listorder/Orderlist";
 import Editorder from "./pages/Order/Editorder/Editorder";
 import Contactlist from "./pages/Website_info/Listcontact/Contactlist";
 import Viewcontact from "./pages/Website_info/Editbanner/Viewcontact";
+import TaxManager from "./pages/Tax/TaxManager";
 function App() {
- 
+
   return (
     <div className="app">
-      
+
       <Router>
-      <Sidebar>
-        <Routes>
-         <Route path="/" element={<Login />} />
-        <Route path="/resetpassword" element={<Forgetpassword />} />
-        <Route path="/forgetpassword/:id1/:id2" element={<Resetpassword />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/addprofile" element={<Addprofile/>} />
-          <Route path="/profiledetail" element={<Profiledetail/>} />
-          <Route path="/editprofile" element={<Editprofile/>} />
-          <Route path="/webinfo" element={<Webinfo/>} />
-          <Route path="/addvariant/:id" element={<AddVariant />} />
-          <Route path="/editvariant/:id" element={<EditVariant />} />
-          <Route path="/userlist/:id" element={<Userlist />} />
-          <Route path="/contactlist/:id" element={<Contactlist />} />
-          <Route path="/brandlist/:id" element={<Brandlist />} />
-          <Route path="/bannerlist/:id" element={<Bannerlist />} />
-          <Route path="/categorylist/:id" element={<Categorylist />} />
-          <Route path="/attributelist/:id" element={<Attributelist />} />
-          <Route path="/cartlist/:id" element={<Cartlist />} />
-          <Route path="/productlist/:id" element={<Productlist />} />
-          <Route path="/orderlist/:id" element={<Orderlist />} />
-          <Route path="/editcategory/:id" element={<EditCategory />} />
-          <Route path="/editproduct/:id" element={<EditProduct />} />
-          <Route path="/editattribute/:id" element={<Editattribute />} />
-          <Route path="/editorder/:id" element={<Editorder />} />
-          <Route path="/addcategory" element={<Addcategory />} />
-          <Route path="/viewcontactform/:id" element={<Viewcontact />} />
-          <Route path="/addbanner" element={<Addbanner />} />
-          <Route path="/addbrand" element={<Addbrand />} />
-          <Route path="/addattribute" element={<Addattribute />} />
-          <Route path="/addproduct" element={<Addproduct />} />
-          <Route path="/edituser/:id" element={<Edituser />} />
-          <Route path="/editbanner/:id" element={<Editbanner />} />
-          <Route path="/editbrand/:id" element={<Editbrand />} />
-          <Route path="*" element={<> not found</>} />
-        </Routes>
-      </Sidebar>
-    </Router>
+        <Sidebar>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/resetpassword" element={<Forgetpassword />} />
+            <Route path="/forgetpassword/:id1/:id2" element={<Resetpassword />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/addprofile" element={<Addprofile />} />
+            <Route path="/profiledetail" element={<Profiledetail />} />
+            <Route path="/editprofile" element={<Editprofile />} />
+            <Route path="/webinfo" element={<Webinfo />} />
+            <Route path="/addvariant/:id" element={<AddVariant />} />
+            <Route path="/editvariant/:id" element={<EditVariant />} />
+            <Route path="/userlist/:id" element={<Userlist />} />
+            <Route path="/contactlist/:id" element={<Contactlist />} />
+            <Route path="/brandlist/:id" element={<Brandlist />} />
+            <Route path="/bannerlist/:id" element={<Bannerlist />} />
+            <Route path="/categorylist/:id" element={<Categorylist />} />
+            <Route path="/attributelist/:id" element={<Attributelist />} />
+            <Route path="/cartlist/:id" element={<Cartlist />} />
+            <Route path="/productlist/:id" element={<Productlist />} />
+            <Route path="/orderlist/:id" element={<Orderlist />} />
+            <Route path="/taxes" element={<TaxManager />} />
+            <Route path="/editcategory/:id" element={<EditCategory />} />
+            <Route path="/editproduct/:id" element={<EditProduct />} />
+            <Route path="/editattribute/:id" element={<Editattribute />} />
+            <Route path="/editorder/:id" element={<Editorder />} />
+            <Route path="/addcategory" element={<Addcategory />} />
+            <Route path="/viewcontactform/:id" element={<Viewcontact />} />
+            <Route path="/addbanner" element={<Addbanner />} />
+            <Route path="/addbrand" element={<Addbrand />} />
+            <Route path="/addattribute" element={<Addattribute />} />
+            <Route path="/addproduct" element={<Addproduct />} />
+            <Route path="/edituser/:id" element={<Edituser />} />
+            <Route path="/editbanner/:id" element={<Editbanner />} />
+            <Route path="/editbrand/:id" element={<Editbrand />} />
+            <Route path="*" element={<> not found</>} />
+          </Routes>
+        </Sidebar>
+      </Router>
     </div>
   );
 }
